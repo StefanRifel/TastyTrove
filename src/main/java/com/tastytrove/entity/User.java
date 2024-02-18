@@ -1,19 +1,30 @@
 package com.tastytrove.entity;
 
-import com.tastytrove.enums.UserRole;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @NamedQuery(name = "User.findByEmail", query = "select u from User u where u.email=:email")
 
-@Entity
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
 @Table(name = "user")
-public class User {
+public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     @Column(name = "userid")
-    private Long userid;
+    private Integer userid;
 
     @Column(name = "firstName")
     private String firstName;
@@ -28,19 +39,41 @@ public class User {
     private String password;
 
     @Column(name = "role")
-    private UserRole userRole;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
-    public User() {
-
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
-    public User(Long userid, String firstName, String lastName, String email, String password, UserRole userRole) {
-        this.userid = userid;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.userRole = userRole;
+    @Override
+    public String getUsername() {
+        return email;
     }
 
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

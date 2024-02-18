@@ -1,9 +1,12 @@
-package com.tastytrove.jwt;
+package com.tastytrove.jwt.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfiguration {
+@RequiredArgsConstructor
+public class SecurityConfiguration {
+
 }

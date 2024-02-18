@@ -5,7 +5,6 @@ import com.tastytrove.service.UserService;
 import com.tastytrove.util.Logger;
 import com.tastytrove.util.ResponseUtil;
 import com.tastytrove.util.ResponseMassage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +14,6 @@ import java.util.Map;
 @RestController
 public class UserController implements UserRest {
 
-    @Autowired
     UserService userService;
 
     @Override
