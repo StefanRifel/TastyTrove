@@ -12,4 +12,7 @@ public interface UserRest {
 
     @PostMapping(path = "/signup")
     public ResponseEntity<String> signUp(@RequestBody() Map<String, String> requestMap);
+
+    @RequestMapping(path = "/login")
+    public ResponseEntity<String> login(@RequestBody() Map<String, String> requestMap);
 }

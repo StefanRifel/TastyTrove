@@ -1,10 +1,13 @@
 package com.tastytrove.entity;
 
+import com.tastytrove.enums.UserRole;
 import jakarta.persistence.*;
+import lombok.Data;
 
 @NamedQuery(name = "User.findByEmail", query = "select u from User u where u.email=:email")
 
 @Entity
+@Data
 @Table(name = "user")
 public class User {
     @Id
@@ -24,55 +27,20 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "role")
+    private UserRole userRole;
+
     public User() {
 
     }
 
-    public User(Long userid, String firstName, String lastName, String email, String password) {
+    public User(Long userid, String firstName, String lastName, String email, String password, UserRole userRole) {
         this.userid = userid;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.userRole = userRole;
     }
 
-    public void setUserid(Long userid) {
-        this.userid = userid;
-    }
-
-    public Long getUserid() {
-        return userid;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

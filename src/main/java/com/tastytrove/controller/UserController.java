@@ -23,7 +23,17 @@ public class UserController implements UserRest {
         try {
             return userService.signUp(requestMap);
         } catch (Exception e) {
-            Logger.logg("UserController");
+            Logger.logg("UserController: Exception in signUp()");
+        }
+        return ResponseUtil.createResponseEntity(ResponseMassage.ERROR_OCCURRED, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> login(Map<String, String> requestMap) {
+        try {
+            return userService.login(requestMap);
+        } catch (Exception e) {
+            Logger.logg("UserController: Exception in login()");
         }
         return ResponseUtil.createResponseEntity(ResponseMassage.ERROR_OCCURRED, HttpStatus.INTERNAL_SERVER_ERROR);
     }

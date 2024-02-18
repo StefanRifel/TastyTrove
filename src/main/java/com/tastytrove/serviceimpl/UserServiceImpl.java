@@ -41,6 +41,17 @@ public class UserServiceImpl implements UserService {
         return ResponseUtil.createResponseEntity(ResponseMassage.ERROR_OCCURRED, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<String> login(Map<String, String> requestMap) {
+        Logger.logg("Inside signUp with: ", requestMap);
+        try {
+
+        } catch (Exception e){
+            Logger.logg("UserServiceImpl: Exception in login()");
+        }
+        return  ResponseUtil.createResponseEntity(ResponseMassage.ERROR_OCCURRED, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private User getUserFromMap(Map<String, String> requestMap) {
         User user = new User();
         user.setFirstName(requestMap.get("firstName"));
