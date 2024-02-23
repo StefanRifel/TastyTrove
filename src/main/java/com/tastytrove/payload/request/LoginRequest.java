@@ -1,18 +1,14 @@
-package com.tastytrove.jwt.auth;
+package com.tastytrove.payload.request;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class LoginRequest {
 
-    private String firstName;
-    private String lastName;
     private String email;
     private String password;
 }

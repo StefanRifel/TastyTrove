@@ -9,42 +9,61 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
-
-@NamedQuery(name = "User.findByEmail", query = "select u from User u where u.email=:email")
+import java.util.*;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user")
+@Table(name = "tbl_user")
 public class User implements UserDetails {
     @Id
     @GeneratedValue
     @Column(name = "userid")
-    private Integer userid;
+    private Long id;
+
+    @Column(name = "username", unique = true, nullable = false)
+    private String username;
 
     @Column(name = "firstName")
-    private String firstName;
+    private String firstname;
 
     @Column(name = "lastName")
-    private String lastName;
+    private String lastname;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    @Column(name = "password")
+    @Column(name = "password", length = 64)
     private String password;
 
-    @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "tbl_user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userid"),
+        inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "userid"))
+    private Set<Role> userRoles;
+
+    @Column(name = "enabled")
+    private boolean enabled = false;
+
+    public void addRole(Role role){
+        if(userRoles == null){
+            userRoles = new HashSet<>();
+        }
+        userRoles.add(role);
+    }
+
+    public void deleteRole(Role role){
+        userRoles.remove(role);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        List<SimpleGrantedAuthority> list = new ArrayList<>();
+        for(Role role: userRoles){
+            list.add(new SimpleGrantedAuthority(role.toString()));
+        }
+        return list;
     }
 
     @Override
@@ -74,6 +93,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 }

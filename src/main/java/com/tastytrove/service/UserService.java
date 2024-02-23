@@ -1,12 +1,8 @@
 package com.tastytrove.service;
 
+import com.tastytrove.entity.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
-import org.springframework.http.ResponseEntity;
-
-import java.util.Map;
-
-public interface UserService {
-    ResponseEntity<String> signUp(Map<String, String> requestMap);
-
-    ResponseEntity<String> login(Map<String, String> requestMap);
+public interface UserService extends UserDetailsService {
+    User loadUserByEmail(String email);
 }
