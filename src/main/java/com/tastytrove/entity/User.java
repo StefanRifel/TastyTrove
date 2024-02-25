@@ -38,7 +38,7 @@ public class User implements UserDetails {
     @Column(name = "password", length = 64)
     private String password;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "tbl_user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userid"),
         inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "userid"))
     private Set<Role> userRoles;
@@ -96,6 +96,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        //todo
+        return true;
     }
 }
