@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 
 import java.util.Date;
+import java.util.UUID;
 import java.util.function.Function;
 
 
@@ -28,6 +29,7 @@ public class JwtUtils {
 
     public String generateJwtToken(User user){
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
     private AuthenticationService authenticationService;
 
     @PostMapping("/signup")

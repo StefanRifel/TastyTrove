@@ -21,7 +21,7 @@ public class TestController {
     }
 
     @GetMapping("/user")
-    @PostAuthorize("hasAnyRole('USER', 'MODERATOR', 'ADMIN')")
+    //@PostAuthorize("hasAnyRole('USER', 'MODERATOR', 'ADMIN')")
     public String userAccess(){
         log.info("user Endpoint hit");
         return "user content";

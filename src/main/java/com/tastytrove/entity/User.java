@@ -5,12 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
+@Slf4j
 @Data
 @Builder
 @NoArgsConstructor
@@ -41,28 +43,29 @@ public class User implements UserDetails {
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "tbl_user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userid"),
         inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "userid"))
-    private Set<Role> userRoles;
+    private Set<Role> roles;
 
     @Column(name = "enabled")
     private boolean enabled = false;
 
     public void addRole(Role role){
-        if(userRoles == null){
-            userRoles = new HashSet<>();
+        if(roles == null){
+            roles = new HashSet<>();
         }
-        userRoles.add(role);
+        roles.add(role);
     }
 
     public void deleteRole(Role role){
-        userRoles.remove(role);
+        roles.remove(role);
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> list = new ArrayList<>();
-        for(Role role: userRoles){
+        for(Role role: roles){
             list.add(new SimpleGrantedAuthority(role.toString()));
         }
+        log.info("getAuthorities: {}", list);
         return list;
     }
 

@@ -13,7 +13,6 @@ import com.tastytrove.repository.UserRepository;
 import com.tastytrove.service.AuthenticationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -63,7 +62,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return ResponseEntity.badRequest().body(new MessageResponse("\"Error: Role is not found.\""));
         }
 
-        user.setUserRoles(roles);
+        user.setRoles(roles);
         userRepository.save(user);
         String token = jwtUtils.generateJwtToken(user);
         return ResponseEntity.ok(new MessageResponse(token));
