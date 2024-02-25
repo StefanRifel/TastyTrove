@@ -6,5 +6,6 @@ import jakarta.persistence.Entity;
 public enum UserRole {
     ADMIN,
     USER,
-    MODERATOR
+    MODERATOR,
+    TEST_USER
 }

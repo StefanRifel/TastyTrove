@@ -68,7 +68,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override
@@ -78,16 +78,19 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
+        //todo
         return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
+        //todo
         return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
+        //todo
         return true;
     }
 

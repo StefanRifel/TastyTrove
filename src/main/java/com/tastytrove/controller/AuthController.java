@@ -58,8 +58,13 @@ public class AuthController {
                 .password(passwordEncoder.encode(signupRequest.getPassword()))
                 .build();
 
-        Set<String> strRoles = signupRequest.getRole();
+        //Set<String> strRoles = signupRequest.getRole();
         Set<Role> roles = new HashSet<>();
+        Role userRole = roleRepository.findByUserRole(UserRole.USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        roles.add(userRole);
+
+        /*
 
         if (strRoles == null) {
             Role userRole = roleRepository.findByUserRole(UserRole.USER)
@@ -88,6 +93,8 @@ public class AuthController {
             });
         }
 
+         */
+
         user.setUserRoles(roles);
         userRepository.save(user);
 
@@ -103,9 +110,11 @@ public class AuthController {
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         User user = (User) authentication.getPrincipal();
+
         List<String> roles = user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
+
 
         JwtResponse jwtResponse = JwtResponse.builder()
                 .token(jwt)

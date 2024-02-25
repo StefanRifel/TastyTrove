@@ -1,8 +1,9 @@
-package com.tastytrove.repository;
+package com.tastytrove.serviceimpl;
 
 import com.tastytrove.entity.Role;
 import com.tastytrove.entity.User;
 import com.tastytrove.entity.UserRole;
+import com.tastytrove.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,22 +13,20 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-class UserRepositoryTest {
+class UserServiceImplTest {
 
     @MockBean
     private UserRepository userRepository;
-
-    private User expectedUser;
 
     @BeforeEach
     void setUp() {
         Role role = new Role();
         role.setUserRole(UserRole.TEST_USER);
 
-        expectedUser = User.builder()
+        User expectedUser = User.builder()
                 .username("john_doe")
                 .firstname("John")
                 .lastname("Doe")
@@ -39,31 +38,23 @@ class UserRepositoryTest {
 
         Mockito.when(userRepository.findByEmail("john.doe@example.com")).thenReturn(Optional.of(expectedUser));
         Mockito.when(userRepository.findByUsername("john_doe")).thenReturn(Optional.of(expectedUser));
-        Mockito.when(userRepository.save(expectedUser)).thenReturn(expectedUser);
     }
 
     @Test
-    void saveUser() {
-        User actualUser = userRepository.save(expectedUser);
-
-        assertEquals(expectedUser, actualUser);
-    }
-
-    @Test
-    void findByEmail() {
-        String expected = "john.doe@example.com";
-        Optional<User> user = userRepository.findByEmail(expected);
+    void loadUserByEmail() {
+        String email = "john.doe@example.com";
+        Optional<User> user = userRepository.findByEmail("john.doe@example.com");
 
         assertThat(user.isPresent()).isTrue();
-        assertEquals(expected, user.get().getEmail());
+        assertEquals(email, user.get().getEmail());
     }
 
     @Test
-    void findByUsername() {
-        String expected = "john_doe";
-        Optional<User> user = userRepository.findByUsername(expected);
+    void loadUserByUsername() {
+        String username = "john_doe";
+        Optional<User> user = userRepository.findByUsername(username);
 
         assertThat(user.isPresent()).isTrue();
-        assertEquals(expected, user.get().getUsername());
+        assertEquals(username, user.get().getUsername());
     }
 }
