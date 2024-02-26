@@ -9,9 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Builder
@@ -23,14 +21,41 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true, nullable = false)
+    private String username;
+    private String firstname;
+    private String lastname;
+    @Column(unique = true, nullable = false)
     private String email;
+    @Column(length = 64, nullable = false)
     private String password;
-    @Embedded
-    private Role role;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "tbl_user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
+    private boolean enabled = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.getRole()));
+        List<GrantedAuthority> list = new ArrayList<>();
+        for(Role role: roles) {
+            list.add(new SimpleGrantedAuthority(role.getName()));
+        }
+        return list;
+    }
+
+    public void addRole(Role role){
+        if(roles == null){
+            roles = new HashSet<>();
+        }
+        roles.add(role);
+    }
+
+    public void deleteRole(Role role){
+        roles.remove(role);
     }
 
     @Override
@@ -55,6 +80,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
+        //todo mechanismus to enable new users
         return true;
     }
 

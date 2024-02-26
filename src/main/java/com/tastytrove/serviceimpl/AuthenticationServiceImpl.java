@@ -4,6 +4,7 @@ import com.tastytrove.entity.Role;
 import com.tastytrove.entity.User;
 import com.tastytrove.jwt.JwtUtils;
 import com.tastytrove.payload.ReqRes;
+import com.tastytrove.repository.RoleRepository;
 import com.tastytrove.repository.UserRepository;
 import com.tastytrove.service.AuthenticationService;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.*;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private UserRepository userRepository;
+    private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
     private JwtUtils jwtUtils;
     private AuthenticationManager authenticationManager;
@@ -28,16 +30,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public ReqRes signUp(ReqRes signupRequest){
         ReqRes response = new ReqRes();
+        List<String> userRoles = signupRequest.getRole();
+
+        Set<Role> roles = new HashSet<>();
+        for (String role: userRoles){
+            Role gotRole = roleRepository.findByName(role);
+            roles.add(gotRole);
+        }
+
         try {
             User user = User.builder()
                     .email(signupRequest.getEmail())
                     .password(passwordEncoder.encode(signupRequest.getPassword()))
-                    .role(new Role(signupRequest.getRole()))
+                    .roles(roles)
                     .build();
 
             User userResult = userRepository.save(user);
             if(userResult != null && userResult.getId() > 0) {
-                //response.setOurUsers(userResult);
                 response.setMessage("User Saved Successfully");
                 response.setStatusCode(200);
             }
