@@ -3,7 +3,6 @@ package com.tastytrove.configuration;
 import com.tastytrove.jwt.JwtAuthenticationFilter;
 import com.tastytrove.service.UserService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -55,6 +54,7 @@ public class WebSecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
+                //.exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests(request -> request.requestMatchers("/auth/**", "/public/**").permitAll()
                         .requestMatchers("/admin/**").hasAnyAuthority("ADMIN")
                         .requestMatchers("/user/**").hasAnyAuthority("USER")
@@ -64,23 +64,9 @@ public class WebSecurityConfiguration {
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
                 );
+        //.formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
+        //.httpBasic(Customizer.withDefaults())
 
         return http.build();
-
-        /*
-        return http.csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(WHITE_LIST_URLS).permitAll()
-                                .requestMatchers("/api/test/user").hasRole("USER")
-                                .anyRequest().authenticated()
-                ).userDetailsService(userService)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                //.formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
-                //.httpBasic(Customizer.withDefaults())
-                .build();
-
-         */
     }
 }

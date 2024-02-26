@@ -1,4 +1,4 @@
-package com.tastytrove.payload.response;
+package com.tastytrove.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MessageResponse {
-    private int statusCode;
-    private String error;
-    private String message;
+public class JwtRefreshRequest {
+    private String token;
 }

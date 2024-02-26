@@ -1,7 +1,7 @@
 package com.tastytrove.controller;
 
 import com.tastytrove.entity.Product;
-import com.tastytrove.payload.ReqRes;
+import com.tastytrove.payload.request.ProductRequest;
 import com.tastytrove.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,24 +19,26 @@ public class AdminUserController {
     private ProductRepository productRepository;
 
     @GetMapping("/public/product")
-    public ResponseEntity<Object> getAllProducts(){
+    public ResponseEntity<?> getAllProducts(){
         return ResponseEntity.ok(productRepository.findAll());
     }
 
     @PostMapping("/admin/saveproduct")
-    public ResponseEntity<Object> saveProduct(@RequestBody ReqRes productRequest){
-        Product productToSave = new Product();
-        productToSave.setName(productRequest.getName());
-        return ResponseEntity.ok(productRepository.save(productToSave));
+    public ResponseEntity<?> saveProduct(@RequestBody ProductRequest productRequest){
+        Product product = Product.builder()
+                .name(productRequest.getName())
+                .build();
+
+        return ResponseEntity.ok(productRepository.save(product));
     }
 
     @GetMapping("/user/alone")
-    public ResponseEntity<Object> userAlone(){
+    public ResponseEntity<?> userAlone(){
         return ResponseEntity.ok("Users alone can access this ApI only");
     }
 
     @GetMapping("/adminuser/both")
-    public ResponseEntity<Object> bothAdminaAndUsersApi(){
+    public ResponseEntity<?> bothAdminaAndUsersApi(){
         return ResponseEntity.ok("Both Admin and Users Can access the api");
     }
 
