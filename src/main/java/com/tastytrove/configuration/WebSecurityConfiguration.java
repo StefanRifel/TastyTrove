@@ -23,10 +23,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfiguration {
-    private static final String[] WHITE_LIST_URLS = {
-            "/api/auth/**",
-            "/api/test/all"
-    };
+
+    //private static final String[] WHITE_LIST_URLS = {};
 
     private UserService userService;
     private JwtAuthenticationFilter jwtAuthenticationFilter;
