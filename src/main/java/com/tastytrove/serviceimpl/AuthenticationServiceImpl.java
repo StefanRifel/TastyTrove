@@ -1,5 +1,6 @@
 package com.tastytrove.serviceimpl;
 
+import com.tastytrove.entity.Role;
 import com.tastytrove.entity.User;
 import com.tastytrove.jwt.JwtUtils;
 import com.tastytrove.payload.ReqRes;
@@ -7,10 +8,8 @@ import com.tastytrove.repository.UserRepository;
 import com.tastytrove.service.AuthenticationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,12 +32,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             User user = User.builder()
                     .email(signupRequest.getEmail())
                     .password(passwordEncoder.encode(signupRequest.getPassword()))
-                    .role(signupRequest.getRole())
+                    .role(new Role(signupRequest.getRole()))
                     .build();
 
             User userResult = userRepository.save(user);
             if(userResult != null && userResult.getId() > 0) {
-                response.setOurUsers(userResult);
+                //response.setOurUsers(userResult);
                 response.setMessage("User Saved Successfully");
                 response.setStatusCode(200);
             }
