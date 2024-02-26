@@ -1,10 +1,10 @@
 package com.tastytrove.service;
 
-import com.tastytrove.payload.request.LoginRequest;
-import com.tastytrove.payload.request.SignupRequest;
+import com.tastytrove.payload.ReqRes;
 import org.springframework.http.ResponseEntity;
 
 public interface AuthenticationService {
-    ResponseEntity<?> signup(SignupRequest request);
-    ResponseEntity<?> login(LoginRequest request);
+    ReqRes signUp(ReqRes request);
+    ReqRes signIn(ReqRes request);
+    ReqRes refreshToken(ReqRes request);
 }

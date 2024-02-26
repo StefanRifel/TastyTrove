@@ -1,58 +1,42 @@
 package com.tastytrove.jwt;
 
-import com.tastytrove.entity.User;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Date;
-import java.util.UUID;
+import java.util.HashMap;
 import java.util.function.Function;
 
 
-@Slf4j
 @Component
 public class JwtUtils {
 
-    @Value("${app.jwtSecret}")
-    private String secretKey;
+    private static final String SECRET_KEY = "843567893696976453275974432697R634976R738467TR678T34865R6834R8763T478378637664538745673865783678548735687R3";;
+    private  static  final long EXPIRATION_TIME = 86400000;
 
-    @Value("${app.jwtExpirationMs}")
-    private int expirationTime;
+    private SecretKey getSignInKey() {
+        byte[] keyBytes = Base64.getDecoder().decode(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+        return new SecretKeySpec(keyBytes, "HmacSHA256");
+    }
 
-    public String generateJwtToken(User user){
+    public String generateJwtToken(UserDetails userDetails){
         return Jwts.builder()
-                .id(UUID.randomUUID().toString())
-                .subject(user.getUsername())
+                .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expirationTime))
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSignInKey())
                 .compact();
     }
 
-    private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSignInKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
-
     public <T> T extractClaim(String token, Function<Claims, T> resolver) {
-        Claims claims = extractAllClaims(token);
-        return resolver.apply(claims);
+        return resolver.apply(Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token).getPayload());
     }
 
     public String extractUsername(String token) {
@@ -65,11 +49,16 @@ public class JwtUtils {
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    public String generateRefreshToken(HashMap<String, Object> claims, UserDetails userDetails) {
+        return Jwts.builder()
+                .claims(claims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(getSignInKey())
+                .compact();
     }
-
 }

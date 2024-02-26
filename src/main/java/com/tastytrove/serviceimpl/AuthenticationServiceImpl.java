@@ -1,14 +1,8 @@
 package com.tastytrove.serviceimpl;
 
-import com.tastytrove.entity.Role;
 import com.tastytrove.entity.User;
-import com.tastytrove.entity.UserRole;
 import com.tastytrove.jwt.JwtUtils;
-import com.tastytrove.payload.request.LoginRequest;
-import com.tastytrove.payload.request.SignupRequest;
-import com.tastytrove.payload.response.JwtResponse;
-import com.tastytrove.payload.response.MessageResponse;
-import com.tastytrove.repository.RoleRepository;
+import com.tastytrove.payload.ReqRes;
 import com.tastytrove.repository.UserRepository;
 import com.tastytrove.service.AuthenticationService;
 import lombok.AllArgsConstructor;
@@ -20,10 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @AllArgsConstructor
@@ -31,63 +22,74 @@ import java.util.Set;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private UserRepository userRepository;
-    private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
     private JwtUtils jwtUtils;
     private AuthenticationManager authenticationManager;
 
     @Override
-    public ResponseEntity<?> signup(SignupRequest signupRequest){
+    public ReqRes signUp(ReqRes signupRequest){
+        ReqRes response = new ReqRes();
+        try {
+            User user = User.builder()
+                    .email(signupRequest.getEmail())
+                    .password(passwordEncoder.encode(signupRequest.getPassword()))
+                    .role(signupRequest.getRole())
+                    .build();
 
-        //Check if user already exist with given signupRequest
-        if(userRepository.existsByEmail(signupRequest.getEmail())){
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
-        } else if (userRepository.existsByUsername(signupRequest.getUsername())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+            User userResult = userRepository.save(user);
+            if(userResult != null && userResult.getId() > 0) {
+                response.setOurUsers(userResult);
+                response.setMessage("User Saved Successfully");
+                response.setStatusCode(200);
+            }
+
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setError(e.getMessage());
         }
 
-        User user = User.builder()
-                .firstname(signupRequest.getFirstname())
-                .lastname(signupRequest.getLastname())
-                .username(signupRequest.getUsername())
-                .email(signupRequest.getEmail())
-                .password(passwordEncoder.encode(signupRequest.getPassword()))
-                .build();
-
-        Set<Role> roles = new HashSet<>();
-        Optional<Role> userRole = roleRepository.findByUserRole(UserRole.USER);
-        if(userRole.isPresent()){
-            roles.add(userRole.get());
-        } else {
-            return ResponseEntity.badRequest().body(new MessageResponse("\"Error: Role is not found.\""));
-        }
-
-        user.setRoles(roles);
-        userRepository.save(user);
-        String token = jwtUtils.generateJwtToken(user);
-        return ResponseEntity.ok(new MessageResponse(token));
+        return response;
     }
 
     @Override
-    public ResponseEntity<?> login(LoginRequest loginRequest) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow();
-        String token = token = jwtUtils.generateJwtToken(user);
+    public ReqRes signIn(ReqRes loginRequest) {
+        ReqRes response = new ReqRes();
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+            User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow();
+            log.info("User is: {}", user);
+            String jwt = jwtUtils.generateJwtToken(user);
+            String refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
 
+            response.setStatusCode(200);
+            response.setToken(jwt);
+            response.setRefreshToken(refreshToken);
+            response.setExpirationTime("24Hr");
+            response.setMessage("Successfully Signed In");
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setError(e.getMessage());
+        }
+        return response;
+    }
 
-        List<String> roles = user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+    @Override
+    public ReqRes refreshToken(ReqRes request) {
+        ReqRes response = new ReqRes();
+        String ourEmail = jwtUtils.extractUsername(request.getToken());
+        User users = userRepository.findByEmail(ourEmail).orElseThrow();
+        if (jwtUtils.isValid(request.getToken(), users)) {
+            var jwt = jwtUtils.generateJwtToken(users);
+            response.setStatusCode(200);
+            response.setToken(jwt);
+            response.setRefreshToken(request.getToken());
+            response.setExpirationTime("24Hr");
+            response.setMessage("Successfully Refreshed Token");
+        } else {
+            response.setStatusCode(500);
+            response.setError("Error refresh Token");
+        }
 
-        JwtResponse jwtResponse = JwtResponse.builder()
-                .token(token)
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .roles(UserRole.USER.toString())
-                .build();
-
-
-        return ResponseEntity.ok(jwtResponse);
+        return response;
     }
 }

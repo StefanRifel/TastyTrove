@@ -1,8 +1,6 @@
 package com.tastytrove.serviceimpl;
 
-import com.tastytrove.entity.Role;
 import com.tastytrove.entity.User;
-import com.tastytrove.entity.UserRole;
 import com.tastytrove.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
