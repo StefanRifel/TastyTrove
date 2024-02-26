@@ -18,5 +18,5 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
 
 app:
-  jwtSecret: ======================TastyTrove=Spring===========================
+  jwtSecret: d958f6a33ea6f50665862fd320aafff60c4058af4019b2f40eb2f0e5a181a1e2
   jwtExpirationMs: 86400000
