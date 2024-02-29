@@ -18,6 +18,11 @@ public class AdminUserController {
 
     private ProductRepository productRepository;
 
+    @GetMapping("/")
+    public String home(){
+        return "Welcome to the homepage";
+    }
+
     @GetMapping("/public/product")
     public ResponseEntity<?> getAllProducts(){
         return ResponseEntity.ok(productRepository.findAll());
