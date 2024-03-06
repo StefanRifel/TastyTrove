@@ -18,7 +18,7 @@ public class AdminUserController {
 
     private ProductRepository productRepository;
 
-    @GetMapping("/")
+    @GetMapping("/message")
     public String home(){
         return "Welcome to the homepage";
     }
